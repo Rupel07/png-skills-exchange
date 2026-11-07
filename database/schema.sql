@@ -112,3 +112,39 @@ create policy "reviews insert own" on public.reviews
   for insert to authenticated with check (auth.uid() = reviewer_id);
 create policy "reviews delete own" on public.reviews
   for delete to authenticated using (auth.uid() = reviewer_id);
+
+//Create table and RLS policies 
+create table if not exists service_requests (
+  id uuid primary key default gen_random_uuid(),
+  skill_id uuid not null references skills(id) on delete cascade,
+  requester_id uuid not null references auth.users(id) on delete cascade,
+  provider_id uuid not null references auth.users(id) on delete cascade,
+  message text not null,
+  preferred_date date,
+  status text not null default 'pending'
+    check (status in ('pending', 'accepted', 'declined', 'cancelled', 'completed')),
+  created_at timestamptz not null default now()
+);
+
+alter table service_requests enable row level security;
+
+-- Both sides can see a request.
+create policy "Parties view their requests"
+  on service_requests for select to authenticated
+  using (auth.uid() = requester_id or auth.uid() = provider_id);
+
+-- Only the requester can create, and cannot request their own skill.
+create policy "Requester creates request"
+  on service_requests for insert to authenticated
+  with check (auth.uid() = requester_id and requester_id <> provider_id);
+
+-- Either side can update (status changes).
+create policy "Parties update their requests"
+  on service_requests for update to authenticated
+  using (auth.uid() = requester_id or auth.uid() = provider_id);
+
+-- Requester can delete their own request.
+create policy "Requester deletes request"
+  on service_requests for delete to authenticated
+  using (auth.uid() = requester_id);
+

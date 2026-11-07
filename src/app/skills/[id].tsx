@@ -54,6 +54,7 @@ export default function SkillDetailsScreen() {
   );
 
   const isOwner = !!skill && skill.user_id === currentUserId;
+  const price = (skill as (Skill & { price?: number | null }) | null)?.price;
 
   const confirmDelete = () => {
     if (!skill) return;
@@ -105,15 +106,15 @@ export default function SkillDetailsScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Stack.Screen options={{ title: "Skill Details" }} />
 
-      <Text style={styles.title}>{skill.title}</Text>
+      <Text style={styles.title}>
+        {(skill as Skill & { title: string }).title}
+      </Text>
 
       <View style={styles.metaRow}>
         <View style={styles.chip}>
           <Text style={styles.chipText}>{skill.category}</Text>
         </View>
-        {skill.price != null && (
-          <Text style={styles.price}>K{skill.price}</Text>
-        )}
+        {price != null && <Text style={styles.price}>K{price}</Text>}
       </View>
 
       <Text style={styles.label}>Description</Text>
@@ -159,7 +160,17 @@ export default function SkillDetailsScreen() {
         </View>
       ) : (
         <View style={styles.actions}>
-          {/* The "Request Service" button goes here in the requests phase */}
+          <Pressable
+            style={[styles.btn, styles.editBtn]}
+            onPress={() =>
+              router.push({
+                pathname: "/requests/new",
+                params: { skillId: skill.id },
+              } as unknown as Href)
+            }
+          >
+            <Text style={styles.btnText}>Request Service</Text>
+          </Pressable>
         </View>
       )}
     </ScrollView>

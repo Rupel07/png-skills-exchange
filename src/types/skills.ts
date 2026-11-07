@@ -1,11 +1,12 @@
 export type Skill = {
   id: string;
   user_id: string;
-  title: string;
-  description: string;
+  skill_name: string;
   category: string;
-  price: number | null;
+  description: string;
   location: string | null;
+  latitude: number | null;
+  longitude: number | null;
   created_at: string;
 };
 

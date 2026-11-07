@@ -16,6 +16,14 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="browse"
+        options={{
+          title: "Skills",
+          tabBarIcon: () => <Text style={{ fontSize: 20 }}>🛠️</Text>,
+        }}
+      />
+
+      <Tabs.Screen
         name="explore"
         options={{
           title: "Explore",

@@ -17,7 +17,8 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "package": "com.rupel07.pngskillsexchange",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "output": "server",
@@ -32,11 +33,28 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#1F6FEB"
+        }
       ]
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "6e439c82-d293-41ce-b300-0da6ee776d48"
+      }
+    },
+    "owner": "rupel7"
   }
 }

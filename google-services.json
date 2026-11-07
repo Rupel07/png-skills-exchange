@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "454816609623",
+    "project_id": "png-skills-exchange",
+    "storage_bucket": "png-skills-exchange.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:454816609623:android:0143f310d1c67aae203a12",
+        "android_client_info": {
+          "package_name": "com.rupel07.pngskillsexchange"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBTQE35BiuE_fjCbAFNdEVPl-Xuw0Nk0GQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

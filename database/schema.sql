@@ -148,3 +148,75 @@ create policy "Requester deletes request"
   on service_requests for delete to authenticated
   using (auth.uid() = requester_id);
 
+-- =========================================================
+-- Push notifications (US10)
+-- =========================================================
+
+create table if not exists push_tokens (
+  token text primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+alter table push_tokens enable row level security;
+
+drop policy if exists "Users manage own tokens" on push_tokens;
+create policy "Users manage own tokens"
+  on push_tokens for all to authenticated
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+-- Sends an Expo push to the requester when the provider
+-- accepts, declines or completes a request.
+create extension if not exists pg_net with schema extensions;
+
+create or replace function notify_request_response()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+declare
+  skill text;
+  msg text;
+  payload jsonb;
+begin
+  if new.status = old.status then return new; end if;
+  if new.status not in ('accepted', 'declined', 'completed') then return new; end if;
+
+  select skill_name into skill from skills where id = new.skill_id;
+
+  msg := case new.status
+    when 'accepted'  then 'Your request for "' || coalesce(skill, 'a skill') || '" was accepted.'
+    when 'declined'  then 'Your request for "' || coalesce(skill, 'a skill') || '" was declined.'
+    else                  'Your request for "' || coalesce(skill, 'a skill') || '" was marked completed.'
+  end;
+
+  select jsonb_agg(jsonb_build_object(
+           'to', token,
+           'title', 'Request update',
+           'body', msg,
+           'sound', 'default',
+           'channelId', 'default',
+           'data', jsonb_build_object('requestId', new.id)
+         ))
+    into payload
+    from push_tokens
+   where user_id = new.requester_id;
+
+  if payload is not null then
+    perform net.http_post(
+      url := 'https://exp.host/--/api/v2/push/send',
+      headers := jsonb_build_object('Content-Type', 'application/json'),
+      body := payload
+    );
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists trg_notify_request_response on service_requests;
+create trigger trg_notify_request_response
+  after update of status on service_requests
+  for each row execute function notify_request_response();

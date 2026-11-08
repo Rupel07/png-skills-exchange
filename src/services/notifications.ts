@@ -18,7 +18,7 @@ let currentToken: string | null = null;
 
 export async function registerForPushNotifications(userId: string) {
   try {
-    if (!Device.isDevice) return null; // push is tested on a real phone
+    if (!Device.isDevice) return null; // push needs a real phone
 
     if (Platform.OS === "android") {
       await Notifications.setNotificationChannelAsync("default", {

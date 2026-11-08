@@ -2,31 +2,20 @@ import * as Notifications from "expo-notifications";
 import { router } from "expo-router";
 import { useEffect } from "react";
 import { supabase } from "../lib/supabase";
-
-async function registerForPushNotifications(userId: string) {
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  const { status } =
-    existingStatus === "granted"
-      ? { status: existingStatus }
-      : await Notifications.requestPermissionsAsync();
-
-  if (status !== "granted") return;
-
-  const token = (await Notifications.getExpoPushTokenAsync()).data;
-  await supabase
-    .from("profiles")
-    .update({ push_token: token })
-    .eq("id", userId);
-}
+import { registerForPushNotifications } from "../services/notifications";
 
 export function usePushNotifications() {
   useEffect(() => {
     let active = true;
 
     (async () => {
-      const { data } = await supabase.auth.getUser();
-      if (data.user && active) {
-        await registerForPushNotifications(data.user.id);
+      try {
+        const { data } = await supabase.auth.getUser();
+        if (data.user && active) {
+          await registerForPushNotifications(data.user.id);
+        }
+      } catch (e: any) {
+        console.log("Push hook error:", e?.message ?? e);
       }
     })();
 

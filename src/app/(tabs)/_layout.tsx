@@ -65,11 +65,9 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: "Profile",
-          tabBarIcon: tabIcon("person", "person-outline"),
+          tabBarIcon: tabIcon(" 👤"),
         }}
       />
-      {/* Hides the leftover template tab. Delete this line if you use Explore. */}
-      <Tabs.Screen name="explore" options={{ href: null }} />
     </Tabs>
   );
 }

@@ -13,12 +13,33 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { supabase } from "../../lib/supabase";
+import { useAuth } from "../../context/AuthContext";
 import { createRequest } from "../../services/requests";
 import { getSkill } from "../../services/skills";
 import { Skill } from "../../types/skills";
 
 type Errors = { message?: string; date?: string };
+
+const styles = StyleSheet.create({
+  center: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 24,
+  },
+  errorText: {
+    color: colors.text,
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  outlineBtn: {
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+});
 
 function isValidDate(value: string): boolean {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
@@ -28,9 +49,10 @@ function isValidDate(value: string): boolean {
 
 export default function NewRequestScreen() {
   const { skillId } = useLocalSearchParams<{ skillId: string }>();
+  const { user } = useAuth();
+  const userId = user?.id ?? null;
 
   const [skill, setSkill] = useState<Skill | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [date, setDate] = useState("");
   const [errors, setErrors] = useState<Errors>({});
@@ -42,13 +64,8 @@ export default function NewRequestScreen() {
     let active = true;
     (async () => {
       try {
-        const [skillData, userRes] = await Promise.all([
-          getSkill(skillId),
-          supabase.auth.getUser(),
-        ]);
-        if (!active) return;
-        setSkill(skillData);
-        setUserId(userRes.data.user?.id ?? null);
+        const skillData = await getSkill(skillId);
+        if (active) setSkill(skillData);
       } catch (e) {
         if (active) setLoadError("Could not load this skill.");
       } finally {
@@ -104,7 +121,7 @@ export default function NewRequestScreen() {
     return (
       <View style={styles.center}>
         <Stack.Screen options={{ title: "Request Service" }} />
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -115,20 +132,20 @@ export default function NewRequestScreen() {
         <Stack.Screen options={{ title: "Request Service" }} />
         <Text style={styles.errorText}>{loadError ?? "Skill not found."}</Text>
         <Pressable style={styles.outlineBtn} onPress={() => router.back()}>
-          <Text style={styles.outlineText}>Go back</Text>
+          <Text style={{ color: colors.primary }}>Go back</Text>
         </Pressable>
       </View>
     );
   }
 
-  // Block requesting your own skill.
-  if (skill.user_id === userId) {
+  // Block requesting your own skill
+  if (userId === skill.user_id) {
     return (
       <View style={styles.center}>
         <Stack.Screen options={{ title: "Request Service" }} />
-        <Text style={styles.errorText}>You can't request your own skill.</Text>
+        <Text style={styles.errorText}>You cannot request your own skill.</Text>
         <Pressable style={styles.outlineBtn} onPress={() => router.back()}>
-          <Text style={styles.outlineText}>Go back</Text>
+          <Text style={{ color: colors.primary }}>Go back</Text>
         </Pressable>
       </View>
     );
@@ -138,143 +155,73 @@ export default function NewRequestScreen() {
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={80}
     >
       <Stack.Screen options={{ title: "Request Service" }} />
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.skillCard}>
-          <Text style={styles.skillLabel}>You are requesting</Text>
-          <Text style={styles.skillTitle}>{skill.skill_name}</Text>
-          <Text style={styles.skillMeta}>{skill.category}</Text>
-        </View>
-
-        <Text style={styles.label}>Message *</Text>
+      <ScrollView contentContainerStyle={{ padding: 24 }}>
+        <Text style={{ fontSize: 22, fontWeight: "bold", marginBottom: 8 }}>
+          Request: {skill.id}
+        </Text>
+        <Text style={{ color: colors.text, marginBottom: 24 }}>
+          Provider ID: {skill.user_id}
+        </Text>
+        <Text style={{ fontWeight: "bold", marginBottom: 4 }}>Message</Text>
         <TextInput
-          style={[
-            styles.input,
-            styles.multiline,
-            errors.message && styles.inputError,
-          ]}
+          style={{
+            borderWidth: 1,
+            borderColor: errors.message ? "red" : colors.border,
+            borderRadius: 8,
+            padding: 12,
+            marginBottom: 4,
+            minHeight: 80,
+            textAlignVertical: "top",
+          }}
+          multiline
           value={message}
           onChangeText={setMessage}
-          placeholder="Describe what you need and any details the provider should know"
-          placeholderTextColor={colors.placeholder}
-          multiline
-          textAlignVertical="top"
+          placeholder="Describe what you need..."
         />
         {errors.message ? (
-          <Text style={styles.error}>{errors.message}</Text>
+          <Text style={{ color: "red", marginBottom: 8 }}>
+            {errors.message}
+          </Text>
         ) : null}
-
-        <Text style={styles.label}>Preferred date (optional)</Text>
+        <Text style={{ fontWeight: "bold", marginBottom: 4, marginTop: 16 }}>
+          Preferred Date (optional)
+        </Text>
         <TextInput
-          style={[styles.input, errors.date && styles.inputError]}
+          style={{
+            borderWidth: 1,
+            borderColor: errors.date ? "red" : colors.border,
+            borderRadius: 8,
+            padding: 12,
+            marginBottom: 4,
+          }}
           value={date}
           onChangeText={setDate}
           placeholder="YYYY-MM-DD"
-          placeholderTextColor={colors.placeholder}
-          keyboardType="numbers-and-punctuation"
-          maxLength={10}
+          keyboardType="numeric"
         />
-        {errors.date ? <Text style={styles.error}>{errors.date}</Text> : null}
-
+        {errors.date ? (
+          <Text style={{ color: "red", marginBottom: 8 }}>{errors.date}</Text>
+        ) : null}
         <Pressable
-          style={[styles.submitBtn, saving && styles.disabled]}
+          style={{
+            backgroundColor: colors.primary,
+            borderRadius: 8,
+            paddingVertical: 14,
+            alignItems: "center",
+            marginTop: 24,
+            opacity: saving ? 0.7 : 1,
+          }}
           onPress={onSubmit}
           disabled={saving}
         >
-          {saving ? (
-            <ActivityIndicator color={colors.primary} />
-          ) : (
-            <Text style={styles.submitText}>Send request</Text>
-          )}
-        </Pressable>
-
-        <Pressable
-          style={styles.cancelBtn}
-          onPress={() => router.back()}
-          disabled={saving}
-        >
-          <Text style={styles.cancelText}>Cancel</Text>
+          <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
+            {saving ? "Sending..." : "Send Request"}
+          </Text>
         </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: 20, paddingBottom: 48 },
-  center: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24,
-  },
-  skillCard: {
-    backgroundColor: colors.primarySoft,
-    borderRadius: 12,
-    padding: 16,
-  },
-  skillLabel: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: colors.primary,
-    textTransform: "uppercase",
-  },
-  skillTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: colors.text,
-    marginTop: 4,
-  },
-  skillMeta: { fontSize: 14, color: colors.neutralText, marginTop: 4 },
-  label: {
-    marginTop: 20,
-    marginBottom: 6,
-    fontSize: 13,
-    fontWeight: "700",
-    color: colors.textBody,
-  },
-  input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: colors.text,
-  },
-  multiline: { minHeight: 120 },
-  inputError: { borderColor: colors.danger },
-  error: { color: colors.danger, fontSize: 13, marginTop: 4 },
-  errorText: {
-    fontSize: 15,
-    color: colors.danger,
-    textAlign: "center",
-    marginBottom: 12,
-  },
-  submitBtn: {
-    marginTop: 28,
-    backgroundColor: colors.primary,
-    paddingVertical: 14,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  disabled: { opacity: 0.6 },
-  submitText: { color: colors.background, fontWeight: "700", fontSize: 16 },
-  cancelBtn: { marginTop: 12, paddingVertical: 12, alignItems: "center" },
-  cancelText: { color: colors.primary, fontWeight: "600", fontSize: 15 },
-  outlineBtn: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.primary,
-  },
-  outlineText: { color: colors.primary, fontWeight: "600" },
-});

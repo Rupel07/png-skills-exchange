@@ -184,7 +184,7 @@ export default function SkillFormScreen() {
           value={title}
           onChangeText={setTitle}
           placeholder="e.g. House painting"
-          placeholderTextColor="#999"
+          placeholderTextColor={colors.placeholder}
         />
         {errors.title ? <Text style={styles.error}>{errors.title}</Text> : null}
 
@@ -221,7 +221,7 @@ export default function SkillFormScreen() {
           value={description}
           onChangeText={setDescription}
           placeholder="Describe what you offer, your experience, and your availability"
-          placeholderTextColor="#999"
+          placeholderTextColor={colors.placeholder}
           multiline
           textAlignVertical="top"
         />
@@ -235,7 +235,7 @@ export default function SkillFormScreen() {
           value={price}
           onChangeText={setPrice}
           placeholder="e.g. 50"
-          placeholderTextColor="#999"
+          placeholderTextColor={colors.placeholder}
           keyboardType="numeric"
         />
         {errors.price ? <Text style={styles.error}>{errors.price}</Text> : null}
@@ -246,7 +246,7 @@ export default function SkillFormScreen() {
           value={location}
           onChangeText={setLocation}
           placeholder="e.g. Lae, Morobe"
-          placeholderTextColor="#999"
+          placeholderTextColor={colors.placeholder}
         />
         <Pressable
           style={styles.locationBtn}
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     fontSize: 13,
     fontWeight: "700",
-    color: "#444",
+    color: colors.textBody,
   },
   input: {
     backgroundColor: colors.surface,
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderColor: colors.primary,
   },
-  chipText: { color: "#444", fontWeight: "600", fontSize: 14 },
+  chipText: { color: colors.textBody, fontWeight: "600", fontSize: 14 },
   chipTextSelected: { color: colors.primary },
   locationBtn: {
     marginTop: 10,

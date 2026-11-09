@@ -22,6 +22,9 @@ export const colors = {
   warningText: "#9A6B00",
   neutralBg: "#E6E8EB",
   neutralText: "#555555",
+  textBody: "#444444",
+  placeholder: "#999999",
+  shadow: "#000000",
 };
 
 export const statusColors = {

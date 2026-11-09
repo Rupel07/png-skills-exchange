@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     textTransform: "uppercase",
   },
-  body: { marginTop: 4, fontSize: 16, color: "#333", lineHeight: 22 },
+  body: { marginTop: 4, fontSize: 16, color: colors.text, lineHeight: 22 },
   actions: { flexDirection: "row", gap: 12, marginTop: 32 },
   btn: { flex: 1, paddingVertical: 14, borderRadius: 10, alignItems: "center" },
   editBtn: { backgroundColor: colors.primary },

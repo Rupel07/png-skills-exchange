@@ -19,7 +19,7 @@ const STATUS_COLORS: Record<RequestStatus, { bg: string; fg: string }> = {
   pending: { bg: "#FFF4D6", fg: "#9A6B00" },
   accepted: { bg: "#DDF3E4", fg: "#1B7F3B" },
   declined: { bg: "#FBE0E0", fg: colors.danger },
-  cancelled: { bg: "#E6E8EB", fg: "#555" },
+  cancelled: { bg: "#E6E8EB", fg: colors.neutralText },
   completed: { bg: colors.primarySoft, fg: colors.primary },
 };
 
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderColor: colors.primary,
   },
-  filterText: { color: "#444", fontWeight: "600", fontSize: 14 },
+  filterText: { color: colors.textBody, fontWeight: "600", fontSize: 14 },
   filterTextSelected: { color: colors.primary },
   list: { padding: 16 },
   emptyContainer: { flexGrow: 1, justifyContent: "center", padding: 24 },
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
     elevation: 2,
-    shadowColor: "#000",
+    shadowColor: colors.shadow,
     shadowOpacity: 0.08,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   },
   badge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
   badgeText: { fontSize: 12, fontWeight: "700", textTransform: "capitalize" },
-  message: { marginTop: 8, fontSize: 14, color: "#333" },
+  message: { marginTop: 8, fontSize: 14, color: colors.text },
   date: { marginTop: 8, fontSize: 12, color: colors.textMuted },
   errorText: {
     fontSize: 15,
@@ -253,5 +253,5 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
   },
-  retryText: { color: "#fff", fontWeight: "600" },
+  retryText: { color: colors.onPrimary, fontWeight: "600" },
 });

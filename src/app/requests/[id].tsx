@@ -23,7 +23,7 @@ const STATUS_COLORS: Record<RequestStatus, { bg: string; fg: string }> = {
   pending: { bg: "#FFF4D6", fg: "#9A6B00" },
   accepted: { bg: "#DDF3E4", fg: "#1B7F3B" },
   declined: { bg: "#FBE0E0", fg: colors.danger },
-  cancelled: { bg: "#E6E8EB", fg: "#555" },
+  cancelled: { bg: "#E6E8EB", fg: colors.neutralText },
   completed: { bg: colors.primarySoft, fg: colors.primary },
 };
 
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     textTransform: "uppercase",
   },
-  body: { marginTop: 4, fontSize: 16, color: "#333", lineHeight: 22 },
+  body: { marginTop: 4, fontSize: 16, color: colors.text, lineHeight: 22 },
   linkBtn: { marginTop: 20, alignSelf: "flex-start" },
   linkText: { color: colors.primary, fontWeight: "600", fontSize: 15 },
   actions: { marginTop: 28, gap: 12 },
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
   },
   disabled: { opacity: 0.6 },
-  btnText: { color: "#fff", fontWeight: "700", fontSize: 16 },
+  btnText: { color: colors.onPrimary, fontWeight: "700", fontSize: 16 },
   outlineActionText: { color: colors.primary },
   errorText: {
     fontSize: 15,

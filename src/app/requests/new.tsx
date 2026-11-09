@@ -161,7 +161,7 @@ export default function NewRequestScreen() {
           value={message}
           onChangeText={setMessage}
           placeholder="Describe what you need and any details the provider should know"
-          placeholderTextColor="#999"
+          placeholderTextColor={colors.placeholder}
           multiline
           textAlignVertical="top"
         />
@@ -175,7 +175,7 @@ export default function NewRequestScreen() {
           value={date}
           onChangeText={setDate}
           placeholder="YYYY-MM-DD"
-          placeholderTextColor="#999"
+          placeholderTextColor={colors.placeholder}
           keyboardType="numbers-and-punctuation"
           maxLength={10}
         />
@@ -231,13 +231,13 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginTop: 4,
   },
-  skillMeta: { fontSize: 14, color: "#555", marginTop: 4 },
+  skillMeta: { fontSize: 14, color: colors.neutralText, marginTop: 4 },
   label: {
     marginTop: 20,
     marginBottom: 6,
     fontSize: 13,
     fontWeight: "700",
-    color: "#444",
+    color: colors.textBody,
   },
   input: {
     backgroundColor: colors.surface,

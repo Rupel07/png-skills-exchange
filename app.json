@@ -35,6 +35,12 @@
         }
       ],
       [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "PNG Skills Exchange uses your location to show skills near you."
+        }
+      ],
+      [
         "expo-notifications",
         {
           "color": "#1F6FEB"

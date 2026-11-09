@@ -57,20 +57,6 @@ export default function SkillsListScreen() {
   const openSkill = (id: string) =>
     router.push({ pathname: "/skills/[id]" as any, params: { id } });
 
-  const getSkillTitle = (item: Skill) => {
-    const record = item as Record<string, unknown>;
-
-    if (typeof record.title === "string" && record.title.trim()) {
-      return record.title;
-    }
-
-    if (typeof record.name === "string" && record.name.trim()) {
-      return record.name;
-    }
-
-    return "Untitled skill";
-  };
-
   const renderItem = ({ item }: { item: Skill }) => (
     <Pressable
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
@@ -78,8 +64,9 @@ export default function SkillsListScreen() {
     >
       <View style={styles.cardHeader}>
         <Text style={styles.title} numberOfLines={1}>
-          {getSkillTitle(item)}
+          {item.skill_name}
         </Text>
+        {item.price != null && <Text style={styles.price}>K{item.price}</Text>}
       </View>
       <Text style={styles.category}>{item.category}</Text>
       <Text style={styles.description} numberOfLines={2}>
@@ -174,7 +161,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     elevation: 4,
   },
-  fabText: { color: colors.primary, fontSize: 30, lineHeight: 32 },
+  fabText: { color: colors.onPrimary, fontSize: 30, lineHeight: 32 },
   card: {
     marginHorizontal: 16,
     marginVertical: 6,
@@ -190,7 +177,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   title: { flex: 1, fontSize: 17, fontWeight: "600", color: colors.text },
-  price: { marginLeft: 12, fontWeight: "600", color: colors.primary },
+  price: { marginLeft: 12, fontWeight: "600", color: colors.success },
   category: { marginTop: 6, color: colors.textMuted },
   description: { marginTop: 8, color: colors.text },
   location: { marginTop: 8, color: colors.textMuted },

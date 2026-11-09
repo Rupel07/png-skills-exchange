@@ -1,5 +1,4 @@
 import { colors } from "@/theme";
-import { User } from "@supabase/supabase-js";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
@@ -11,14 +10,15 @@ import {
   Text,
   View,
 } from "react-native";
-import { supabase } from "../../lib/supabase";
+import { useAuth } from "../../context/AuthContext";
 import { removePushToken } from "../../services/notifications";
-
-type Stats = { skills: number; sent: number; received: number };
+import { getProfileStats, ProfileStats } from "../../services/profile";
 
 export default function ProfileScreen() {
-  const [user, setUser] = useState<User | null>(null);
-  const [stats, setStats] = useState<Stats>({
+  const { user, signOut } = useAuth();
+  const userId = user?.id;
+
+  const [stats, setStats] = useState<ProfileStats>({
     skills: 0,
     sent: 0,
     received: 0,
@@ -28,35 +28,15 @@ export default function ProfileScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      if (!userId) {
+        setLoading(false);
+        return;
+      }
       let active = true;
       (async () => {
         try {
-          const { data } = await supabase.auth.getUser();
-          const u = data.user;
-          if (!u || !active) return;
-          setUser(u);
-
-          const [skills, sent, received] = await Promise.all([
-            supabase
-              .from("skills")
-              .select("id", { count: "exact", head: true })
-              .eq("user_id", u.id),
-            supabase
-              .from("service_requests")
-              .select("id", { count: "exact", head: true })
-              .eq("requester_id", u.id),
-            supabase
-              .from("service_requests")
-              .select("id", { count: "exact", head: true })
-              .eq("provider_id", u.id),
-          ]);
-          if (active) {
-            setStats({
-              skills: skills.count ?? 0,
-              sent: sent.count ?? 0,
-              received: received.count ?? 0,
-            });
-          }
+          const result = await getProfileStats(userId);
+          if (active) setStats(result);
         } catch (e: any) {
           console.log("Profile load error:", e?.message ?? e);
         } finally {
@@ -66,7 +46,7 @@ export default function ProfileScreen() {
       return () => {
         active = false;
       };
-    }, []),
+    }, [userId]),
   );
 
   const confirmLogout = () => {
@@ -79,7 +59,7 @@ export default function ProfileScreen() {
           try {
             setSigningOut(true);
             await removePushToken(); // stop notifications for this account on this phone
-            await supabase.auth.signOut();
+            await signOut(); // clears the offline cache, then signs out
           } catch (e: any) {
             console.log("Logout error:", e?.message ?? e);
             Alert.alert("Error", "Could not log out. Try again.");
@@ -93,7 +73,7 @@ export default function ProfileScreen() {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -144,7 +124,7 @@ export default function ProfileScreen() {
         disabled={signingOut}
       >
         {signingOut ? (
-          <ActivityIndicator color={colors.primary} />
+          <ActivityIndicator color={colors.onPrimary} />
         ) : (
           <Text style={styles.logoutText}>Log out</Text>
         )}
@@ -194,7 +174,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  avatarText: { color: colors.primary, fontSize: 30, fontWeight: "700" },
+  avatarText: { color: colors.onPrimary, fontSize: 30, fontWeight: "700" },
   name: { marginTop: 12, fontSize: 22, fontWeight: "700", color: colors.text },
   email: { marginTop: 2, fontSize: 14, color: colors.textMuted },
   statsRow: { flexDirection: "row", gap: 10, marginTop: 24 },
@@ -244,5 +224,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   disabled: { opacity: 0.6 },
-  logoutText: { color: colors.surface, fontWeight: "700", fontSize: 16 },
+  logoutText: { color: colors.onPrimary, fontWeight: "700", fontSize: 16 },
 });

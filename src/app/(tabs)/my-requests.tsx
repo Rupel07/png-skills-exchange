@@ -9,15 +9,14 @@ import {
   Text,
   View,
 } from "react-native";
-import { supabase } from "../../lib/supabase";
+import { useAuth } from "../../context/AuthContext";
 import { getMyRequests } from "../../services/requests";
 import { ServiceRequest } from "../../types/requests";
-
 type Filter = "sent" | "received";
 
 export default function RequestsListScreen() {
+  const { user } = useAuth();
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
-  const [userId, setUserId] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>("sent");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -26,18 +25,12 @@ export default function RequestsListScreen() {
   const load = useCallback(async () => {
     try {
       setError(null);
-      const [data, userRes] = await Promise.all([
-        getMyRequests(),
-        supabase.auth.getUser(),
-      ]);
-      setRequests(data);
-      setUserId(userRes.data.user?.id ?? null);
+      setRequests(await getMyRequests());
     } catch (e: any) {
       console.log("Requests load error:", e?.message ?? e, e?.code, e?.details);
       setError("Could not load requests. Check your connection and try again.");
     }
   }, []);
-
   // Reload every time the tab comes into focus.
   useFocusEffect(
     useCallback(() => {
@@ -60,7 +53,9 @@ export default function RequestsListScreen() {
   };
 
   const visible = requests.filter((r) =>
-    filter === "sent" ? r.requester_id === userId : r.provider_id === userId,
+    filter === "sent"
+      ? r.requester_id === user?.id
+      : r.provider_id === user?.id,
   );
 
   const renderItem = ({ item }: { item: ServiceRequest }) => {

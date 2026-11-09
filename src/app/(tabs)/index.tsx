@@ -1,8 +1,7 @@
 import { colors } from "@/theme";
-import { router, useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
+import { router } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { supabase } from "../../lib/supabase";
+import { useAuth } from "../../context/AuthContext";
 
 type IconName =
   | "search-outline"
@@ -90,29 +89,15 @@ const OFFER_STEPS = [
 ] as const;
 
 export default function HomeScreen() {
-  const [name, setName] = useState("");
-
-  useFocusEffect(
-    useCallback(() => {
-      let active = true;
-      (async () => {
-        const { data } = await supabase.auth.getUser();
-        const u = data.user;
-        if (!u || !active) return;
-        const meta: Record<string, any> = u.user_metadata ?? {};
-        const full: string =
-          meta.full_name ??
-          meta.name ??
-          meta.display_name ??
-          u.email?.split("@")[0] ??
-          "";
-        setName(full.split(" ")[0]);
-      })();
-      return () => {
-        active = false;
-      };
-    }, []),
-  );
+  const { user } = useAuth();
+  const meta: Record<string, any> = user?.user_metadata ?? {};
+  const fullName: string =
+    meta.full_name ??
+    meta.name ??
+    meta.display_name ??
+    user?.email?.split("@")[0] ??
+    "";
+  const name = fullName.split(" ")[0];
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>

@@ -1,3 +1,4 @@
+import { colors } from "@/theme";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -131,14 +132,14 @@ export default function HomeScreen() {
           style={[styles.action, styles.actionPrimary]}
           onPress={() => router.push("/(tabs)/browse")}
         >
-          <Ionicons name="search" size={22} color="#fff" />
+          <Ionicons name="search" size={22} color={colors.primary} />
           <Text style={styles.actionTextLight}>Browse skills</Text>
         </Pressable>
         <Pressable
           style={[styles.action, styles.actionOutline]}
           onPress={() => router.push("/skills/form")}
         >
-          <Ionicons name="add" size={24} color="#1F6FEB" />
+          <Ionicons name="add" size={24} color={colors.primary} />
           <Text style={styles.actionTextBlue}>Add a skill</Text>
         </Pressable>
       </View>
@@ -147,7 +148,11 @@ export default function HomeScreen() {
       <Section title="Offering a skill?" steps={OFFER_STEPS} />
 
       <View style={styles.tip}>
-        <Ionicons name="information-circle-outline" size={20} color="#1F6FEB" />
+        <Ionicons
+          name="information-circle-outline"
+          size={20}
+          color={colors.primary}
+        />
         <Text style={styles.tipText}>
           Allow notifications when asked, so you never miss a reply to your
           requests.
@@ -178,7 +183,11 @@ function Section({
             </View>
             <View style={{ flex: 1 }}>
               <View style={styles.stepHeader}>
-                <Ionicons name={s.icon as IconName} size={16} color="#1F6FEB" />
+                <Ionicons
+                  name={s.icon as IconName}
+                  size={16}
+                  color={colors.primary}
+                />
                 <Text style={styles.stepTitle}>{s.title}</Text>
               </View>
               <Text style={styles.stepText}>{s.text}</Text>
@@ -191,12 +200,22 @@ function Section({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F5F6F8" },
+  container: { flex: 1, backgroundColor: colors.background },
   content: { padding: 20, paddingBottom: 40 },
-  hero: { backgroundColor: "#1F6FEB", borderRadius: 16, padding: 20 },
-  heroSmall: { color: "#DCE9FF", fontSize: 15, fontWeight: "600" },
-  heroTitle: { color: "#fff", fontSize: 26, fontWeight: "800", marginTop: 4 },
-  heroText: { color: "#EAF2FF", fontSize: 14, lineHeight: 20, marginTop: 8 },
+  hero: { backgroundColor: colors.primary, borderRadius: 16, padding: 20 },
+  heroSmall: { color: colors.surface, fontSize: 15, fontWeight: "600" },
+  heroTitle: {
+    color: colors.surface,
+    fontSize: 26,
+    fontWeight: "800",
+    marginTop: 4,
+  },
+  heroText: {
+    color: colors.surface,
+    fontSize: 14,
+    lineHeight: 20,
+    marginTop: 8,
+  },
   actions: { flexDirection: "row", gap: 12, marginTop: 16 },
   action: {
     flex: 1,
@@ -207,22 +226,26 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 12,
   },
-  actionPrimary: { backgroundColor: "#1F6FEB" },
+  actionPrimary: { backgroundColor: colors.primary },
   actionOutline: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "#1F6FEB",
+    borderColor: colors.primary,
   },
-  actionTextLight: { color: "#fff", fontWeight: "700", fontSize: 15 },
-  actionTextBlue: { color: "#1F6FEB", fontWeight: "700", fontSize: 15 },
+  actionTextLight: { color: colors.surface, fontWeight: "700", fontSize: 15 },
+  actionTextBlue: { color: colors.primary, fontWeight: "700", fontSize: 15 },
   section: { marginTop: 24 },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#222",
+    color: colors.text,
     marginBottom: 10,
   },
-  card: { backgroundColor: "#fff", borderRadius: 12, paddingHorizontal: 16 },
+  card: {
+    backgroundColor: colors.surface,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+  },
   step: {
     flexDirection: "row",
     alignItems: "flex-start",
@@ -231,29 +254,34 @@ const styles = StyleSheet.create({
   },
   stepBorder: {
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#E3E6EB",
+    borderBottomColor: colors.border,
   },
   stepNumber: {
     width: 26,
     height: 26,
     borderRadius: 13,
-    backgroundColor: "#E3EEFF",
+    backgroundColor: colors.primarySoft,
     alignItems: "center",
     justifyContent: "center",
     marginTop: 1,
   },
-  stepNumberText: { color: "#1F6FEB", fontWeight: "700", fontSize: 13 },
+  stepNumberText: { color: colors.primary, fontWeight: "700", fontSize: 13 },
   stepHeader: { flexDirection: "row", alignItems: "center", gap: 6 },
-  stepTitle: { fontSize: 15, fontWeight: "700", color: "#222" },
-  stepText: { marginTop: 3, fontSize: 14, color: "#5B6470", lineHeight: 20 },
+  stepTitle: { fontSize: 15, fontWeight: "700", color: colors.text },
+  stepText: {
+    marginTop: 3,
+    fontSize: 14,
+    color: colors.textMuted,
+    lineHeight: 20,
+  },
   tip: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
     marginTop: 24,
-    backgroundColor: "#E3EEFF",
+    backgroundColor: colors.primarySoft,
     borderRadius: 12,
     padding: 14,
   },
-  tipText: { flex: 1, fontSize: 13, color: "#2A4A7F", lineHeight: 18 },
+  tipText: { flex: 1, fontSize: 13, color: colors.text, lineHeight: 18 },
 });

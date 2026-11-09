@@ -1,18 +1,19 @@
+import { colors } from "@/theme";
 import {
-    router,
-    Stack,
-    useFocusEffect,
-    useLocalSearchParams,
+  router,
+  Stack,
+  useFocusEffect,
+  useLocalSearchParams,
 } from "expo-router";
 import { useCallback, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  ActivityIndicator,
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { supabase } from "../../lib/supabase";
 import { getRequest, updateRequestStatus } from "../../services/requests";
@@ -21,9 +22,9 @@ import { RequestStatus, ServiceRequest } from "../../types/requests";
 const STATUS_COLORS: Record<RequestStatus, { bg: string; fg: string }> = {
   pending: { bg: "#FFF4D6", fg: "#9A6B00" },
   accepted: { bg: "#DDF3E4", fg: "#1B7F3B" },
-  declined: { bg: "#FBE0E0", fg: "#B00020" },
+  declined: { bg: "#FBE0E0", fg: colors.danger },
   cancelled: { bg: "#E6E8EB", fg: "#555" },
-  completed: { bg: "#E3EEFF", fg: "#1F6FEB" },
+  completed: { bg: colors.primarySoft, fg: colors.primary },
 };
 
 type Action = {
@@ -225,7 +226,7 @@ export default function RequestDetailsScreen() {
             >
               {updating ? (
                 <ActivityIndicator
-                  color={a.style === "outline" ? "#1F6FEB" : "#fff"}
+                  color={a.style === "outline" ? colors.fg : "#fff"}
                 />
               ) : (
                 <Text
@@ -246,7 +247,7 @@ export default function RequestDetailsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F5F6F8" },
+  container: { flex: 1, backgroundColor: colors.background },
   content: { padding: 20, paddingBottom: 40 },
   center: {
     flex: 1,
@@ -264,37 +265,42 @@ const styles = StyleSheet.create({
     marginRight: 10,
     fontSize: 24,
     fontWeight: "700",
-    color: "#222",
+    color: colors.text,
   },
   badge: { paddingHorizontal: 12, paddingVertical: 5, borderRadius: 14 },
   badgeText: { fontSize: 13, fontWeight: "700", textTransform: "capitalize" },
-  category: { marginTop: 6, fontSize: 14, color: "#5B6470" },
-  role: { marginTop: 14, fontSize: 14, fontWeight: "600", color: "#1F6FEB" },
+  category: { marginTop: 6, fontSize: 14, color: colors.textMuted },
+  role: {
+    marginTop: 14,
+    fontSize: 14,
+    fontWeight: "600",
+    color: colors.primary,
+  },
   label: {
     marginTop: 20,
     fontSize: 12,
     fontWeight: "700",
-    color: "#666",
+    color: colors.textMuted,
     textTransform: "uppercase",
   },
   body: { marginTop: 4, fontSize: 16, color: "#333", lineHeight: 22 },
   linkBtn: { marginTop: 20, alignSelf: "flex-start" },
-  linkText: { color: "#1F6FEB", fontWeight: "600", fontSize: 15 },
+  linkText: { color: colors.primary, fontWeight: "600", fontSize: 15 },
   actions: { marginTop: 28, gap: 12 },
   btn: { paddingVertical: 14, borderRadius: 10, alignItems: "center" },
-  primaryBtn: { backgroundColor: "#1F6FEB" },
-  dangerBtn: { backgroundColor: "#D32F2F" },
+  primaryBtn: { backgroundColor: colors.primary },
+  dangerBtn: { backgroundColor: colors.danger },
   outlineActionBtn: {
     borderWidth: 1,
-    borderColor: "#1F6FEB",
-    backgroundColor: "#fff",
+    borderColor: colors.primary,
+    backgroundColor: colors.surface,
   },
   disabled: { opacity: 0.6 },
   btnText: { color: "#fff", fontWeight: "700", fontSize: 16 },
-  outlineActionText: { color: "#1F6FEB" },
+  outlineActionText: { color: colors.primary },
   errorText: {
     fontSize: 15,
-    color: "#B00020",
+    color: colors.danger,
     textAlign: "center",
     marginBottom: 12,
   },
@@ -303,7 +309,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#1F6FEB",
+    borderColor: colors.primary,
   },
-  outlineText: { color: "#1F6FEB", fontWeight: "600" },
+  outlineText: { color: colors.primary, fontWeight: "600" },
 });

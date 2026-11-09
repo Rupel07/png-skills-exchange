@@ -1,12 +1,13 @@
+import { colors } from "@/theme";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { supabase } from "../../lib/supabase";
 import { getMyRequests } from "../../services/requests";
@@ -17,9 +18,9 @@ type Filter = "sent" | "received";
 const STATUS_COLORS: Record<RequestStatus, { bg: string; fg: string }> = {
   pending: { bg: "#FFF4D6", fg: "#9A6B00" },
   accepted: { bg: "#DDF3E4", fg: "#1B7F3B" },
-  declined: { bg: "#FBE0E0", fg: "#B00020" },
+  declined: { bg: "#FBE0E0", fg: colors.danger },
   cancelled: { bg: "#E6E8EB", fg: "#555" },
-  completed: { bg: "#E3EEFF", fg: "#1F6FEB" },
+  completed: { bg: colors.primarySoft, fg: colors.primary },
 };
 
 export default function RequestsListScreen() {
@@ -180,7 +181,7 @@ export default function RequestsListScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F5F6F8" },
+  container: { flex: 1, backgroundColor: colors.background },
   center: {
     flex: 1,
     alignItems: "center",
@@ -192,13 +193,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 8,
     borderRadius: 18,
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "#D5D9DF",
+    borderColor: colors.border,
   },
-  filterChipSelected: { backgroundColor: "#1F6FEB", borderColor: "#1F6FEB" },
+  filterChipSelected: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
   filterText: { color: "#444", fontWeight: "600", fontSize: 14 },
-  filterTextSelected: { color: "#fff" },
+  filterTextSelected: { color: colors.primary },
   list: { padding: 16 },
   emptyContainer: { flexGrow: 1, justifyContent: "center", padding: 24 },
   emptyBox: { alignItems: "center" },
@@ -206,11 +210,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     marginBottom: 6,
-    color: "#222",
+    color: colors.text,
   },
-  emptyText: { fontSize: 14, color: "#5B6470", textAlign: "center" },
+  emptyText: { fontSize: 14, color: colors.textMuted, textAlign: "center" },
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -231,20 +235,20 @@ const styles = StyleSheet.create({
     marginRight: 8,
     fontSize: 17,
     fontWeight: "700",
-    color: "#222",
+    color: colors.text,
   },
   badge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
   badgeText: { fontSize: 12, fontWeight: "700", textTransform: "capitalize" },
   message: { marginTop: 8, fontSize: 14, color: "#333" },
-  date: { marginTop: 8, fontSize: 12, color: "#5B6470" },
+  date: { marginTop: 8, fontSize: 12, color: colors.textMuted },
   errorText: {
     fontSize: 15,
-    color: "#B00020",
+    color: colors.danger,
     textAlign: "center",
     marginBottom: 12,
   },
   retryBtn: {
-    backgroundColor: "#1F6FEB",
+    backgroundColor: colors.primary,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,

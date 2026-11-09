@@ -1,3 +1,4 @@
+import { colors } from "@/theme";
 import { User } from "@supabase/supabase-js";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
@@ -143,7 +144,7 @@ export default function ProfileScreen() {
         disabled={signingOut}
       >
         {signingOut ? (
-          <ActivityIndicator color="#fff" />
+          <ActivityIndicator color={colors.primary} />
         ) : (
           <Text style={styles.logoutText}>Log out</Text>
         )}
@@ -181,7 +182,7 @@ function Row({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F5F6F8" },
+  container: { flex: 1, backgroundColor: colors.background },
   content: { padding: 20, paddingBottom: 40 },
   center: { flex: 1, alignItems: "center", justifyContent: "center" },
   header: { alignItems: "center", marginTop: 8 },
@@ -189,31 +190,31 @@ const styles = StyleSheet.create({
     width: 84,
     height: 84,
     borderRadius: 42,
-    backgroundColor: "#1F6FEB",
+    backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
   },
-  avatarText: { color: "#fff", fontSize: 30, fontWeight: "700" },
-  name: { marginTop: 12, fontSize: 22, fontWeight: "700", color: "#222" },
-  email: { marginTop: 2, fontSize: 14, color: "#5B6470" },
+  avatarText: { color: colors.primary, fontSize: 30, fontWeight: "700" },
+  name: { marginTop: 12, fontSize: 22, fontWeight: "700", color: colors.text },
+  email: { marginTop: 2, fontSize: 14, color: colors.textMuted },
   statsRow: { flexDirection: "row", gap: 10, marginTop: 24 },
   stat: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: "center",
   },
-  statValue: { fontSize: 22, fontWeight: "700", color: "#1F6FEB" },
+  statValue: { fontSize: 22, fontWeight: "700", color: colors.primary },
   statLabel: {
     marginTop: 2,
     fontSize: 12,
-    color: "#5B6470",
+    color: colors.textMuted,
     fontWeight: "600",
   },
   card: {
     marginTop: 16,
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     borderRadius: 12,
     paddingHorizontal: 16,
   },
@@ -225,23 +226,23 @@ const styles = StyleSheet.create({
   },
   rowBorder: {
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#E3E6EB",
+    borderBottomColor: colors.border,
   },
-  rowLabel: { fontSize: 14, color: "#5B6470", fontWeight: "600" },
+  rowLabel: { fontSize: 14, color: colors.textMuted, fontWeight: "600" },
   rowValue: {
     flex: 1,
     marginLeft: 16,
     textAlign: "right",
     fontSize: 15,
-    color: "#222",
+    color: colors.text,
   },
   logoutBtn: {
     marginTop: 28,
-    backgroundColor: "#D32F2F",
+    backgroundColor: colors.danger,
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: "center",
   },
   disabled: { opacity: 0.6 },
-  logoutText: { color: "#fff", fontWeight: "700", fontSize: 16 },
+  logoutText: { color: colors.surface, fontWeight: "700", fontSize: 16 },
 });

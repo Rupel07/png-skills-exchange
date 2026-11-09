@@ -1,17 +1,18 @@
+import { colors } from "@/theme";
 import { router } from "expo-router";
 import { type ComponentType, useMemo, useRef, useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    Linking,
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
+  ActivityIndicator,
+  FlatList,
+  Linking,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import WebView, { type WebViewMessageEvent } from "react-native-webview";
 import { MappedSkill, useNearbySkills } from "../../hooks/useNearbySkills";
-import { colors, radius, spacing } from "../../theme";
+import { radius, spacing } from "../../theme";
 import { formatDistance } from "../../utils/distance";
 import { MAP_BASE_URL, buildMapHtml } from "../../utils/mapHtml";
 
@@ -216,7 +217,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     borderRadius: radius.sm,
   },
-  buttonText: { color: "#fff", fontWeight: "600" },
+  buttonText: { color: colors.surface, fontWeight: "600" },
   banner: {
     flexDirection: "row",
     alignItems: "center",

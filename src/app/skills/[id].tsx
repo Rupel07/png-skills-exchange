@@ -1,3 +1,4 @@
+import { colors } from "@/theme";
 import {
   Href,
   router,
@@ -152,7 +153,7 @@ export default function SkillDetailsScreen() {
             disabled={deleting}
           >
             {deleting ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={colors.primary} />
             ) : (
               <Text style={styles.btnText}>Delete</Text>
             )}
@@ -178,7 +179,7 @@ export default function SkillDetailsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F5F6F8" },
+  container: { flex: 1, backgroundColor: colors.background },
   content: { padding: 20, paddingBottom: 40 },
   center: {
     flex: 1,
@@ -186,33 +187,38 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 24,
   },
-  title: { fontSize: 24, fontWeight: "700", color: "#222" },
+  title: { fontSize: 24, fontWeight: "700", color: colors.text },
   metaRow: { flexDirection: "row", alignItems: "center", marginTop: 10 },
   chip: {
-    backgroundColor: "#E3EEFF",
+    backgroundColor: colors.primarySoft,
     paddingHorizontal: 12,
     paddingVertical: 5,
     borderRadius: 14,
   },
-  chipText: { color: "#1F6FEB", fontWeight: "600", fontSize: 13 },
-  price: { marginLeft: 12, fontSize: 18, fontWeight: "700", color: "#246b45" },
+  chipText: { color: colors.primary, fontWeight: "600", fontSize: 13 },
+  price: {
+    marginLeft: 12,
+    fontSize: 18,
+    fontWeight: "700",
+    color: colors.primary,
+  },
   label: {
     marginTop: 20,
     fontSize: 12,
     fontWeight: "700",
-    color: "#666",
+    color: colors.textMuted,
     textTransform: "uppercase",
   },
   body: { marginTop: 4, fontSize: 16, color: "#333", lineHeight: 22 },
   actions: { flexDirection: "row", gap: 12, marginTop: 32 },
   btn: { flex: 1, paddingVertical: 14, borderRadius: 10, alignItems: "center" },
-  editBtn: { backgroundColor: "#1F6FEB" },
-  deleteBtn: { backgroundColor: "#D32F2F" },
+  editBtn: { backgroundColor: colors.primary },
+  deleteBtn: { backgroundColor: colors.danger },
   disabled: { opacity: 0.6 },
-  btnText: { color: "#fff", fontWeight: "700", fontSize: 16 },
+  btnText: { color: colors.primary, fontWeight: "700", fontSize: 16 },
   errorText: {
     fontSize: 15,
-    color: "#B00020",
+    color: colors.danger,
     textAlign: "center",
     marginBottom: 12,
   },
@@ -221,7 +227,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#1F6FEB",
+    borderColor: colors.primary,
   },
-  secondaryText: { color: "#1F6FEB", fontWeight: "600" },
+  secondaryText: { color: colors.primary, fontWeight: "600" },
 });

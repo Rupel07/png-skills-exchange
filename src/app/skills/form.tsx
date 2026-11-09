@@ -1,3 +1,4 @@
+import { colors } from "@/theme";
 import * as Location from "expo-location";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
@@ -253,7 +254,7 @@ export default function SkillFormScreen() {
           disabled={locating}
         >
           {locating ? (
-            <ActivityIndicator color="#1F6FEB" />
+            <ActivityIndicator color={colors.primary} />
           ) : (
             <Text style={styles.locationBtnText}>
               {coords
@@ -277,7 +278,7 @@ export default function SkillFormScreen() {
           disabled={saving}
         >
           {saving ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={colors.primary} />
           ) : (
             <Text style={styles.saveText}>
               {isEdit ? "Save changes" : "Add skill"}
@@ -298,7 +299,7 @@ export default function SkillFormScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F5F6F8" },
+  container: { flex: 1, backgroundColor: colors.background },
   content: { padding: 20, paddingBottom: 48 },
   center: { flex: 1, alignItems: "center", justifyContent: "center" },
   label: {
@@ -309,51 +310,54 @@ const styles = StyleSheet.create({
     color: "#444",
   },
   input: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "#D5D9DF",
+    borderColor: colors.border,
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 16,
-    color: "#222",
+    color: colors.text,
   },
   multiline: { minHeight: 110 },
-  inputError: { borderColor: "#D32F2F" },
-  error: { color: "#D32F2F", fontSize: 13, marginTop: 4 },
+  inputError: { borderColor: colors.danger },
+  error: { color: colors.danger, fontSize: 13, marginTop: 4 },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   chip: {
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 18,
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "#D5D9DF",
+    borderColor: colors.border,
   },
-  chipSelected: { backgroundColor: "#1F6FEB", borderColor: "#1F6FEB" },
+  chipSelected: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
   chipText: { color: "#444", fontWeight: "600", fontSize: 14 },
-  chipTextSelected: { color: "#fff" },
+  chipTextSelected: { color: colors.primary },
   locationBtn: {
     marginTop: 10,
     paddingVertical: 12,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#1F6FEB",
+    borderColor: colors.primary,
     alignItems: "center",
   },
-  locationBtnText: { color: "#1F6FEB", fontWeight: "600", fontSize: 14 },
-  hint: { marginTop: 6, color: "#666", fontSize: 13 },
+  locationBtnText: { color: colors.primary, fontWeight: "600", fontSize: 14 },
+  hint: { marginTop: 6, color: colors.textMuted, fontSize: 13 },
   saveBtn: {
     marginTop: 28,
-    backgroundColor: "#1F6FEB",
+    backgroundColor: colors.primary,
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: "center",
   },
   disabled: { opacity: 0.6 },
-  saveText: { color: "#fff", fontWeight: "700", fontSize: 16 },
+  saveText: { color: colors.primary, fontWeight: "700", fontSize: 16 },
   cancelBtn: { marginTop: 12, paddingVertical: 12, alignItems: "center" },
-  cancelText: { color: "#1F6FEB", fontWeight: "600", fontSize: 15 },
+  cancelText: { color: colors.primary, fontWeight: "600", fontSize: 15 },
 });
 async function getCurrentCoords(): Promise<
   | { status: "granted"; coords: Coords }

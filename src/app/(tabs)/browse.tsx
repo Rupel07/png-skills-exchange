@@ -1,3 +1,4 @@
+import { colors } from "@/theme";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
@@ -8,63 +9,24 @@ import {
   Text,
   View,
 } from "react-native";
-import { getSkills } from "../../services/skills";
+import { getSkillsCached } from "../../services/skills";
 import { Skill } from "../../types/skills";
-
-const styles: Record<string, any> = StyleSheet.create({
-  center: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24,
-  },
-  container: { flex: 1, backgroundColor: "#F5F6F8" },
-  fab: {
-    position: "absolute",
-    right: 20,
-    bottom: 24,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#1F6FEB",
-    alignItems: "center",
-    justifyContent: "center",
-    elevation: 4,
-  },
-  fabText: { color: "#fff", fontSize: 30, lineHeight: 32 },
-
-  card: {
-    marginHorizontal: 16,
-    marginVertical: 6,
-    padding: 16,
-    borderRadius: 12,
-    backgroundColor: "#fff",
-    elevation: 2,
-  },
-  cardPressed: { opacity: 0.75 },
-  cardHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  title: { flex: 1, fontSize: 17, fontWeight: "600", color: "#222" },
-  price: { marginLeft: 12, fontWeight: "600", color: "#246b45" },
-  category: { marginTop: 6, color: "#666" },
-  description: { marginTop: 8, color: "#444" },
-  location: { marginTop: 8, color: "#666" },
-});
 
 export default function SkillsListScreen() {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [offline, setOffline] = useState(false);
+  const [savedAt, setSavedAt] = useState<number | null>(null);
 
   const loadSkills = useCallback(async () => {
     try {
       setError(null);
-      const data = await getSkills();
-      setSkills(data);
+      const result = await getSkillsCached();
+      setSkills(result.skills);
+      setOffline(result.fromCache);
+      setSavedAt(result.savedAt);
     } catch (e) {
       setError("Could not load skills. Check your connection and try again.");
     }
@@ -95,6 +57,20 @@ export default function SkillsListScreen() {
   const openSkill = (id: string) =>
     router.push({ pathname: "/skills/[id]" as any, params: { id } });
 
+  const getSkillTitle = (item: Skill) => {
+    const record = item as Record<string, unknown>;
+
+    if (typeof record.title === "string" && record.title.trim()) {
+      return record.title;
+    }
+
+    if (typeof record.name === "string" && record.name.trim()) {
+      return record.name;
+    }
+
+    return "Untitled skill";
+  };
+
   const renderItem = ({ item }: { item: Skill }) => (
     <Pressable
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
@@ -102,9 +78,8 @@ export default function SkillsListScreen() {
     >
       <View style={styles.cardHeader}>
         <Text style={styles.title} numberOfLines={1}>
-          {item.title}
+          {getSkillTitle(item)}
         </Text>
-        {item.price != null && <Text style={styles.price}>K{item.price}</Text>}
       </View>
       <Text style={styles.category}>{item.category}</Text>
       <Text style={styles.description} numberOfLines={2}>
@@ -120,7 +95,7 @@ export default function SkillsListScreen() {
   if (loading && skills.length === 0 && !error) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -129,9 +104,9 @@ export default function SkillsListScreen() {
   if (error && skills.length === 0) {
     return (
       <View style={styles.center}>
-        <Text style={{ color: "#b00020", textAlign: "center" }}>{error}</Text>
-        <Pressable onPress={onRefresh} style={{ marginTop: 16 }}>
-          <Text style={{ color: "#246b45", fontWeight: "600" }}>Try again</Text>
+        <Text style={styles.errorText}>{error}</Text>
+        <Pressable onPress={onRefresh} style={styles.retry}>
+          <Text style={styles.retryText}>Try again</Text>
         </Pressable>
       </View>
     );
@@ -139,6 +114,15 @@ export default function SkillsListScreen() {
 
   return (
     <View style={styles.container}>
+      {offline && (
+        <View style={styles.offlineBanner}>
+          <Text style={styles.offlineText}>
+            Offline – showing saved skills
+            {savedAt ? ` from ${new Date(savedAt).toLocaleString()}` : ""}
+          </Text>
+        </View>
+      )}
+
       <FlatList
         data={skills}
         keyExtractor={(item) => item.id}
@@ -151,7 +135,7 @@ export default function SkillsListScreen() {
             : { padding: 16, paddingBottom: 96 }
         }
         ListEmptyComponent={
-          <Text style={{ color: "#666", textAlign: "center" }}>
+          <Text style={styles.emptyText}>
             {error ?? "No skills available yet."}
           </Text>
         }
@@ -163,3 +147,55 @@ export default function SkillsListScreen() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  center: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 24,
+  },
+  container: { flex: 1, backgroundColor: colors.background },
+  offlineBanner: {
+    backgroundColor: colors.warningBg,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  offlineText: { color: colors.warningText, fontSize: 13, fontWeight: "600" },
+  fab: {
+    position: "absolute",
+    right: 20,
+    bottom: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 4,
+  },
+  fabText: { color: colors.primary, fontSize: 30, lineHeight: 32 },
+  card: {
+    marginHorizontal: 16,
+    marginVertical: 6,
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: colors.surface,
+    elevation: 2,
+  },
+  cardPressed: { opacity: 0.75 },
+  cardHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  title: { flex: 1, fontSize: 17, fontWeight: "600", color: colors.text },
+  price: { marginLeft: 12, fontWeight: "600", color: colors.primary },
+  category: { marginTop: 6, color: colors.textMuted },
+  description: { marginTop: 8, color: colors.text },
+  location: { marginTop: 8, color: colors.textMuted },
+  errorText: { color: colors.danger, textAlign: "center" },
+  retry: { marginTop: 16 },
+  retryText: { color: colors.primary, fontWeight: "600" },
+  emptyText: { color: colors.textMuted, textAlign: "center" },
+});

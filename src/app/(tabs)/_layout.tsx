@@ -1,10 +1,11 @@
+import { colors } from "@/theme";
 import { Tabs } from "expo-router";
 import { StyleSheet, Text, type ColorValue } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { usePushNotifications } from "../../hooks/usePushNotifications";
 
-const ACTIVE = "#1F6FEB";
-const INACTIVE = "#8A94A6";
+const ACTIVE = colors.primary;
+const INACTIVE = colors.inactive;
 
 type IconProps = { color: ColorValue | null; focused: boolean; size: number };
 

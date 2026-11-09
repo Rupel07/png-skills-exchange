@@ -1,12 +1,12 @@
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { supabase } from "../../lib/supabase";
 import { getMyRequests } from "../../services/requests";
@@ -15,11 +15,11 @@ import { RequestStatus, ServiceRequest } from "../../types/requests";
 type Filter = "sent" | "received";
 
 const STATUS_COLORS: Record<RequestStatus, { bg: string; fg: string }> = {
-  pending: { bg: "#FFF4D6", fg: "#9A6B00" },
-  accepted: { bg: "#DDF3E4", fg: "#1B7F3B" },
-  declined: { bg: "#FBE0E0", fg: "#B00020" },
-  cancelled: { bg: "#E6E8EB", fg: "#555" },
-  completed: { bg: "#E3EEFF", fg: "#1F6FEB" },
+  pending: { bg: "#FFF4CC", fg: "#8A6100" },
+  accepted: { bg: "#DDF5E5", fg: "#176B35" },
+  declined: { bg: "#FDE2E2", fg: "#A12626" },
+  cancelled: { bg: "#E8EAED", fg: "#51565C" },
+  completed: { bg: "#DCEBFF", fg: "#1F4F8A" },
 };
 
 export default function RequestsListScreen() {

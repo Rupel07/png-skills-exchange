@@ -102,9 +102,13 @@ export default function SkillsListScreen() {
     >
       <View style={styles.cardHeader}>
         <Text style={styles.title} numberOfLines={1}>
-          {item.title}
+          {"title" in item && typeof item.title === "string"
+            ? item.title
+            : "Untitled skill"}
         </Text>
-        {item.price != null && <Text style={styles.price}>K{item.price}</Text>}
+        {"price" in item && typeof item.price === "number" && (
+          <Text style={styles.price}>K{item.price}</Text>
+        )}
       </View>
       <Text style={styles.category}>{item.category}</Text>
       <Text style={styles.description} numberOfLines={2}>

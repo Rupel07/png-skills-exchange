@@ -4,6 +4,7 @@ export type Skill = {
   skill_name: string;
   category: string;
   description: string;
+  price: number | null;
   location: string | null;
   latitude: number | null;
   longitude: number | null;

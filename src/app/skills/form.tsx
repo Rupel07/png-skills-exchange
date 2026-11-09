@@ -14,7 +14,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { supabase } from "../../lib/supabase";
+import { useAuth } from "../../context/AuthContext";
 import { createSkill, getSkill, updateSkill } from "../../services/skills";
 
 const CATEGORIES = [
@@ -43,6 +43,7 @@ type Coords = {
 
 export default function SkillFormScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
+  const { user } = useAuth();
   const isEdit = !!id;
 
   const [title, setTitle] = useState("");
@@ -70,12 +71,12 @@ export default function SkillFormScreen() {
         if (skill.latitude != null && skill.longitude != null) {
           setCoords({ latitude: skill.latitude, longitude: skill.longitude });
         }
-        setTitle((skill as unknown as { title?: string }).title ?? "");
+        setTitle(skill.skill_name ?? "");
         setDescription(skill.description);
         setCategory(skill.category);
         const skillPrice = (skill as unknown as { price?: number | null })
           .price;
-        setPrice(skillPrice != null ? String(skillPrice) : "");
+        setPrice(skill.price != null ? String(skill.price) : "");
         setLocation(skill.location ?? "");
       } catch (e) {
         Alert.alert("Error", "Could not load this skill.", [
@@ -104,6 +105,7 @@ export default function SkillFormScreen() {
     setErrors(next);
     return Object.keys(next).length === 0;
   };
+
   const fillFromCurrentLocation = async () => {
     setLocating(true);
     setLocationError(null);
@@ -123,6 +125,7 @@ export default function SkillFormScreen() {
     }
     setLocating(false);
   };
+
   const onSave = async () => {
     if (!validate()) return;
 
@@ -130,6 +133,7 @@ export default function SkillFormScreen() {
       skill_name: title.trim(),
       description: description.trim(),
       category,
+      price: price.trim() === "" ? null : Number(price),
       location: location.trim() === "" ? null : location.trim(),
       latitude: coords?.latitude ?? null,
       longitude: coords?.longitude ?? null,
@@ -140,14 +144,12 @@ export default function SkillFormScreen() {
       if (isEdit && id) {
         await updateSkill(id, input);
       } else {
-        const { data } = await supabase.auth.getUser();
-        const userId = data.user?.id;
-        if (!userId) {
+        if (!user) {
           Alert.alert("Not signed in", "Please log in again.");
           setSaving(false);
           return;
         }
-        await createSkill(input, userId);
+        await createSkill(input, user.id);
       }
       router.back();
     } catch (e) {
@@ -162,7 +164,7 @@ export default function SkillFormScreen() {
     return (
       <View style={styles.center}>
         <Stack.Screen options={{ title: screenTitle }} />
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -278,7 +280,7 @@ export default function SkillFormScreen() {
           disabled={saving}
         >
           {saving ? (
-            <ActivityIndicator color={colors.primary} />
+            <ActivityIndicator color={colors.onPrimary} />
           ) : (
             <Text style={styles.saveText}>
               {isEdit ? "Save changes" : "Add skill"}
@@ -336,41 +338,39 @@ const styles = StyleSheet.create({
     borderColor: colors.primary,
   },
   chipText: { color: colors.textBody, fontWeight: "600", fontSize: 14 },
-  chipTextSelected: { color: colors.primary },
+  chipTextSelected: { color: colors.onPrimary },
   locationBtn: {
     marginTop: 10,
     paddingVertical: 12,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.primary,
     alignItems: "center",
+    justifyContent: "center",
   },
-  locationBtnText: { color: colors.primary, fontWeight: "600", fontSize: 14 },
-  hint: { marginTop: 6, color: colors.textMuted, fontSize: 13 },
+  locationBtnText: { color: colors.primary, fontWeight: "700", fontSize: 15 },
+  hint: { color: colors.textBody, fontSize: 12, marginTop: 6 },
   saveBtn: {
     marginTop: 28,
-    backgroundColor: colors.primary,
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: "center",
+    backgroundColor: colors.primary,
   },
   disabled: { opacity: 0.6 },
-  saveText: { color: colors.primary, fontWeight: "700", fontSize: 16 },
+  saveText: { color: colors.onPrimary, fontSize: 16, fontWeight: "700" },
   cancelBtn: { marginTop: 12, paddingVertical: 12, alignItems: "center" },
-  cancelText: { color: colors.primary, fontWeight: "600", fontSize: 15 },
+  cancelText: { color: colors.textBody, fontWeight: "600" },
 });
-async function getCurrentCoords(): Promise<
+
+type CurrentCoordsResult =
   | { status: "granted"; coords: Coords }
   | { status: "denied" }
-  | { status: "error" }
-> {
+  | { status: "error" };
+
+async function getCurrentCoords(): Promise<CurrentCoordsResult> {
   try {
     const permission = await Location.requestForegroundPermissionsAsync();
     if (permission.status !== "granted") return { status: "denied" };
 
-    const position = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Balanced,
-    });
+    const position = await Location.getCurrentPositionAsync({});
     return {
       status: "granted",
       coords: {
@@ -382,17 +382,13 @@ async function getCurrentCoords(): Promise<
     return { status: "error" };
   }
 }
+
 async function reverseGeocode(coords: Coords): Promise<string | null> {
   try {
-    const [address] = await Location.reverseGeocodeAsync(coords);
-    if (!address) return null;
-
-    const locality = address.city ?? address.district ?? address.subregion;
-    const parts = [locality, address.region].filter(
-      (part, index, all): part is string =>
-        !!part && all.indexOf(part) === index,
-    );
-    return parts.length ? parts.join(", ") : (address.country ?? null);
+    const results = await Location.reverseGeocodeAsync(coords);
+    const place = results[0];
+    if (!place) return null;
+    return [place.city, place.region, place.country].filter(Boolean).join(", ");
   } catch {
     return null;
   }

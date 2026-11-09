@@ -16,6 +16,7 @@ PNG Skills Exchange is a community mobile app for Papua New Guinea that connects
 - Push notification to the requester when a provider accepts, declines or completes a request
 - Profile with account details and activity counts; Home screen with a short how-to-use guide
 - Row Level Security so users can only change their own data
+- Map of skills with distance from your position; saves a position on a skill with one tap
 
 ## Tech stack
 
@@ -63,12 +64,14 @@ Only the publishable key is used in the app. The service role key is never used 
 
 ## External APIs and services
 
-| Service                   | Used for                                                 |
-| ------------------------- | -------------------------------------------------------- |
-| Supabase Auth             | Registration, login, password reset, session persistence |
-| Supabase PostgreSQL + RLS | Skills, service requests, push tokens                    |
-| Expo Push Service         | Sends the notification when a request status changes     |
-| Firebase Cloud Messaging  | Delivers Expo push messages to Android devices           |
+| Service                                    | Used for                                                                    |
+| ------------------------------------------ | --------------------------------------------------------------------------- |
+| Supabase Auth                              | Registration, login, password reset, session persistence                    |
+| Supabase PostgreSQL + RLS                  | Skills, service requests, push tokens                                       |
+| Expo Push Service                          | Sends the notification when a request status changes                        |
+| Firebase Cloud Messaging                   | Delivers Expo push messages to Android devices                              |
+| OpenStreetMap tiles (Leaflet in a WebView) | Shows the map of skills                                                     |
+| Expo Location                              | Gets the user's position, distances, and the place name when saving a skill |
 
 A database trigger (`notify_request_response`, using `pg_net`) calls the Expo Push API when a request changes to accepted, declined or completed.
 
@@ -120,7 +123,6 @@ database/
 - Remote push notifications need the installed APK or a development build; they do not work in Expo Go.
 - Push is sent to the requester only. Providers are not notified when a new request arrives.
 - Request status changes are enforced by the app, but the database policy lets either party update a request.
-- The map and location screen is still in progress.
 - Not built (scope reduction): search, category filters, favourites, ratings and reviews, messaging, rankings.
 
 ## AI assistance

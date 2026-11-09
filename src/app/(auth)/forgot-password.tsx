@@ -1,3 +1,4 @@
+import { colors } from "@/theme";
 import { Link } from "expo-router";
 import { useState } from "react";
 import {
@@ -49,7 +50,7 @@ export default function ForgotPassword() {
         disabled={submitting}
       >
         {submitting ? (
-          <ActivityIndicator color="#fff" />
+          <ActivityIndicator color={colors.onPrimary} />
         ) : (
           <Text style={styles.buttonText}>Send reset link</Text>
         )}
@@ -66,17 +67,17 @@ const styles = StyleSheet.create({
   title: { fontSize: 28, fontWeight: "700", marginBottom: 12 },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: colors.border,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
   },
   button: {
-    backgroundColor: "#1e88e5",
+    backgroundColor: colors.primary,
     padding: 14,
     borderRadius: 8,
     alignItems: "center",
   },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
-  link: { textAlign: "center", color: "#1e88e5", marginTop: 8 },
+  buttonText: { color: colors.onPrimary, fontSize: 16, fontWeight: "600" },
+  link: { textAlign: "center", color: colors.primary, marginTop: 8 },
 });

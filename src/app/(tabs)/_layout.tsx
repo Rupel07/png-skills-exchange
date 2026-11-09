@@ -1,10 +1,11 @@
+import { colors } from "@/theme";
 import { Tabs } from "expo-router";
 import { StyleSheet, Text, type ColorValue } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { usePushNotifications } from "../../hooks/usePushNotifications";
 
-const ACTIVE = "#1F6FEB";
-const INACTIVE = "#8A94A6";
+const ACTIVE = colors.primary;
+const INACTIVE = colors.textMuted;
 
 type IconProps = { color: ColorValue | null; focused: boolean; size: number };
 
@@ -27,16 +28,16 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: true,
         headerTitleAlign: "center",
-        headerTitleStyle: { fontWeight: "700", color: "#222" },
-        headerStyle: { backgroundColor: "#fff" },
+        headerTitleStyle: { fontWeight: "700", color: colors.text },
+        headerStyle: { backgroundColor: colors.surface },
         headerShadowVisible: false,
         tabBarActiveTintColor: ACTIVE,
         tabBarInactiveTintColor: INACTIVE,
         tabBarLabelStyle: { fontSize: 11, fontWeight: "600" },
         tabBarStyle: {
-          backgroundColor: "#fff",
+          backgroundColor: colors.surface,
           borderTopWidth: StyleSheet.hairlineWidth,
-          borderTopColor: "#E3E6EB",
+          borderTopColor: colors.border,
           height: 56 + insets.bottom,
           paddingTop: 6,
           paddingBottom: Math.max(insets.bottom, 8),

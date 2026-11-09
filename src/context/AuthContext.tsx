@@ -1,7 +1,7 @@
 import { Session, User } from "@supabase/supabase-js";
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { clearCache } from "../lib/cache";
 import { supabase } from "../lib/supabase";
-
 type SignUpData = {
   email: string;
   password: string;
@@ -71,6 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    await clearCache();
   };
 
   const resetPassword = async (email: string) => {

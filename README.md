@@ -1,56 +1,132 @@
-# Welcome to your Expo app 👋
+# PNG Skills Exchange
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+PNG Skills Exchange is a community mobile app for Papua New Guinea that connects people who have skills with people who need them. Users post skill listings, browse what others offer, send service requests to providers, and get a push notification when a provider responds. It is built with React Native, Expo and Supabase.
 
-## Get started
+**Student** Ruth Paruru Eludeme  
+| **Student no.** | 23201054  
+| **Unit** | IS323 Mobile Application Development, PNG University of Technology |
+| **Version** | 1.0.0
 
-1. Install dependencies
+## Features
 
-   ```bash
-   npm install
-   ```
+- Register, log in, log out, reset password; the session persists after the app is closed
+- Skills: create, browse, view details, edit and delete (owner only, delete asks for confirmation)
+- Service requests: send a request for a skill, see Sent and Received lists, view details
+- Providers accept, decline or complete a request; requesters can cancel a pending one
+- Push notification to the requester when a provider accepts, declines or completes a request
+- Profile with account details and activity counts; Home screen with a short how-to-use guide
+- Row Level Security so users can only change their own data
 
-2. Start the app
+## Tech stack
 
-   ```bash
-   npx expo start
-   ```
+| Technology                                     | Purpose                                     |
+| ---------------------------------------------- | ------------------------------------------- |
+| React Native + Expo (SDK 58, managed workflow) | Mobile app                                  |
+| TypeScript                                     | Typed code                                  |
+| Expo Router                                    | File-based navigation (tabs + stack)        |
+| Supabase                                       | Authentication, PostgreSQL database, RLS    |
+| expo-notifications                             | Push notification registration and handling |
+| Firebase Cloud Messaging (V1)                  | Android push delivery                       |
+| EAS Build                                      | Signed APK and AAB                          |
 
-In the output, you'll find options to open the app in a
+## Getting started
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+Requirements: Node.js LTS, Git, a Supabase project, and an Android phone.
 
 ```bash
-npm run reset-project
+git clone https://github.com/Rupel07/png-skills-exchange.git
+cd png-skills-exchange
+npm install
+cp .env.example .env      # on Windows: copy .env.example .env
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+1. Open your Supabase project, go to **SQL Editor**, and run `database/schema.sql`. This creates the tables, Row Level Security policies, the `push_tokens` table and the notification trigger.
+2. Fill in `.env` with your own Supabase values (see below).
+3. Start the app:
 
-### Other setup steps
+```bash
+npx expo start
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+Scan the QR code with Expo Go. If the terminal says it is using a development build, press `s` to switch to Expo Go. If your phone cannot connect, use `npx expo start --tunnel`.
 
-## Learn more
+Remote push notifications do not work in Expo Go on Android (SDK 53 and later). Everything else runs in Expo Go. To test push, install the APK from a preview build (see Building).
 
-To learn more about developing your project with Expo, look at the following resources:
+## Environment variables
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+| Name                            | Description                          |
+| ------------------------------- | ------------------------------------ |
+| `EXPO_PUBLIC_SUPABASE_URL`      | Your Supabase project URL            |
+| `EXPO_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anon / publishable key |
 
-## Join the community
+Only the publishable key is used in the app. The service role key is never used or stored. The real `.env` is git-ignored; `.env.example` lists the names with dummy values.
 
-Join our community of developers creating universal apps.
+## External APIs and services
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+| Service                   | Used for                                                 |
+| ------------------------- | -------------------------------------------------------- |
+| Supabase Auth             | Registration, login, password reset, session persistence |
+| Supabase PostgreSQL + RLS | Skills, service requests, push tokens                    |
+| Expo Push Service         | Sends the notification when a request status changes     |
+| Firebase Cloud Messaging  | Delivers Expo push messages to Android devices           |
+
+A database trigger (`notify_request_response`, using `pg_net`) calls the Expo Push API when a request changes to accepted, declined or completed.
+
+## Building the APK and AAB
+
+Build profiles are defined in `eas.json`.
+
+| Profile       | Output         | Command                                              |
+| ------------- | -------------- | ---------------------------------------------------- |
+| `preview`     | APK            | `eas build --platform android --profile preview`     |
+| `production`  | AAB            | `eas build --platform android --profile production`  |
+| `development` | Dev client APK | `eas build --platform android --profile development` |
+
+```bash
+npm install -g eas-cli
+eas login
+eas init
+```
+
+Cloud builds do not read the local `.env`, so the Supabase variables are stored in EAS for each environment:
+
+```bash
+eas env:set --name EXPO_PUBLIC_SUPABASE_URL --value "<url>" --environment preview --visibility plaintext
+eas env:set --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "<publishable key>" --environment preview --visibility plaintext
+```
+
+Repeat with `--environment production` for the AAB build.
+
+- Android package: `com.rupel07.pngskillsexchange`
+- Push notifications also need a Firebase project, `google-services.json`, and an FCM V1 service account key uploaded with `eas credentials`. The private key file is never committed.
+
+## Project structure
+
+```
+src/
+  app/          Expo Router screens: (auth), (tabs), skills/, requests/
+  components/   Reusable UI components
+  context/      AuthContext
+  hooks/        Custom hooks (push notifications)
+  lib/          Supabase client
+  services/     Database and notification access (no UI)
+  types/        Shared TypeScript types
+database/
+  schema.sql    Tables, RLS policies, notification trigger
+```
+
+## Known limitations
+
+- Remote push notifications need the installed APK or a development build; they do not work in Expo Go.
+- Push is sent to the requester only. Providers are not notified when a new request arrives.
+- Request status changes are enforced by the app, but the database policy lets either party update a request.
+- The map and location screen is still in progress.
+- Not built (scope reduction): search, category filters, favourites, ratings and reviews, messaging, rankings.
+
+## AI assistance
+
+I used Claude (Anthropic) as a coding assistant for: planning the order of the build, drafting React Native and TypeScript screens and service code, writing the Supabase SQL (tables, Row Level Security policies and the notification trigger), walking through the EAS, Firebase and Expo push setup, and diagnosing error messages. I ran, tested and adapted the code in my own project and can explain it.
+
+## Credits
+
+Built with Expo, React Native, Expo Router, Supabase, expo-notifications, expo-device, expo-constants and @expo/vector-icons.

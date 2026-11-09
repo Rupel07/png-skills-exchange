@@ -1,16 +1,17 @@
+import * as Location from "expo-location";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 import { supabase } from "../../lib/supabase";
 import { createSkill, getSkill, updateSkill } from "../../services/skills";
@@ -34,6 +35,11 @@ type Errors = {
   price?: string;
 };
 
+type Coords = {
+  latitude: number;
+  longitude: number;
+};
+
 export default function SkillFormScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const isEdit = !!id;
@@ -48,6 +54,10 @@ export default function SkillFormScreen() {
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
 
+  const [coords, setCoords] = useState<Coords | null>(null);
+  const [locating, setLocating] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
+
   // Edit mode: load the skill and pre-fill the fields.
   useEffect(() => {
     if (!id) return;
@@ -56,10 +66,15 @@ export default function SkillFormScreen() {
       try {
         const skill = await getSkill(id);
         if (!active) return;
-        setTitle(skill.title);
+        if (skill.latitude != null && skill.longitude != null) {
+          setCoords({ latitude: skill.latitude, longitude: skill.longitude });
+        }
+        setTitle((skill as unknown as { title?: string }).title ?? "");
         setDescription(skill.description);
         setCategory(skill.category);
-        setPrice(skill.price != null ? String(skill.price) : "");
+        const skillPrice = (skill as unknown as { price?: number | null })
+          .price;
+        setPrice(skillPrice != null ? String(skillPrice) : "");
         setLocation(skill.location ?? "");
       } catch (e) {
         Alert.alert("Error", "Could not load this skill.", [
@@ -88,16 +103,35 @@ export default function SkillFormScreen() {
     setErrors(next);
     return Object.keys(next).length === 0;
   };
-
+  const fillFromCurrentLocation = async () => {
+    setLocating(true);
+    setLocationError(null);
+    const result = await getCurrentCoords();
+    if (result.status === "granted") {
+      setCoords(result.coords);
+      const place = await reverseGeocode(result.coords);
+      if (place && location.trim() === "") setLocation(place);
+    } else if (result.status === "denied") {
+      setLocationError(
+        "Location permission was denied. Allow it in your phone settings, or type the place by hand.",
+      );
+    } else {
+      setLocationError(
+        "Could not get your position. Check that location is switched on and try again.",
+      );
+    }
+    setLocating(false);
+  };
   const onSave = async () => {
     if (!validate()) return;
 
     const input = {
-      title: title.trim(),
+      skill_name: title.trim(),
       description: description.trim(),
       category,
-      price: price.trim() === "" ? null : Number(price),
       location: location.trim() === "" ? null : location.trim(),
+      latitude: coords?.latitude ?? null,
+      longitude: coords?.longitude ?? null,
     };
 
     try {
@@ -213,6 +247,29 @@ export default function SkillFormScreen() {
           placeholder="e.g. Lae, Morobe"
           placeholderTextColor="#999"
         />
+        <Pressable
+          style={styles.locationBtn}
+          onPress={fillFromCurrentLocation}
+          disabled={locating}
+        >
+          {locating ? (
+            <ActivityIndicator color="#1F6FEB" />
+          ) : (
+            <Text style={styles.locationBtnText}>
+              {coords
+                ? "Update from my current location"
+                : "Use my current location"}
+            </Text>
+          )}
+        </Pressable>
+        <Text style={styles.hint}>
+          {coords
+            ? "Map position saved."
+            : "Add a position so this skill appears on the map."}
+        </Text>
+        {locationError ? (
+          <Text style={styles.error}>{locationError}</Text>
+        ) : null}
 
         <Pressable
           style={[styles.saveBtn, saving && styles.disabled]}
@@ -276,6 +333,16 @@ const styles = StyleSheet.create({
   chipSelected: { backgroundColor: "#1F6FEB", borderColor: "#1F6FEB" },
   chipText: { color: "#444", fontWeight: "600", fontSize: 14 },
   chipTextSelected: { color: "#fff" },
+  locationBtn: {
+    marginTop: 10,
+    paddingVertical: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#1F6FEB",
+    alignItems: "center",
+  },
+  locationBtnText: { color: "#1F6FEB", fontWeight: "600", fontSize: 14 },
+  hint: { marginTop: 6, color: "#666", fontSize: 13 },
   saveBtn: {
     marginTop: 28,
     backgroundColor: "#1F6FEB",
@@ -288,3 +355,41 @@ const styles = StyleSheet.create({
   cancelBtn: { marginTop: 12, paddingVertical: 12, alignItems: "center" },
   cancelText: { color: "#1F6FEB", fontWeight: "600", fontSize: 15 },
 });
+async function getCurrentCoords(): Promise<
+  | { status: "granted"; coords: Coords }
+  | { status: "denied" }
+  | { status: "error" }
+> {
+  try {
+    const permission = await Location.requestForegroundPermissionsAsync();
+    if (permission.status !== "granted") return { status: "denied" };
+
+    const position = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Balanced,
+    });
+    return {
+      status: "granted",
+      coords: {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      },
+    };
+  } catch {
+    return { status: "error" };
+  }
+}
+async function reverseGeocode(coords: Coords): Promise<string | null> {
+  try {
+    const [address] = await Location.reverseGeocodeAsync(coords);
+    if (!address) return null;
+
+    const locality = address.city ?? address.district ?? address.subregion;
+    const parts = [locality, address.region].filter(
+      (part, index, all): part is string =>
+        !!part && all.indexOf(part) === index,
+    );
+    return parts.length ? parts.join(", ") : (address.country ?? null);
+  } catch {
+    return null;
+  }
+}

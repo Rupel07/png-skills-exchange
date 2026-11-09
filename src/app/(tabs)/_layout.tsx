@@ -45,27 +45,31 @@ export default function TabLayout() {
     >
       <Tabs.Screen
         name="index"
-        options={{ title: "Home", tabBarIcon: tabIcon("⌂") }}
+        options={{ title: "Home", tabBarIcon: tabIcon("🏠") }}
       />
       <Tabs.Screen
         name="browse"
         options={{
           title: "Skills",
-          tabBarIcon: tabIcon("▣"),
+          tabBarIcon: tabIcon("🛠️"),
         }}
+      />
+      <Tabs.Screen
+        name="map"
+        options={{ title: "Map", tabBarIcon: tabIcon("📍") }}
       />
       <Tabs.Screen
         name="my-requests"
         options={{
           title: "Requests",
-          tabBarIcon: tabIcon("✉"),
+          tabBarIcon: tabIcon("📧"),
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: "Profile",
-          tabBarIcon: tabIcon(" 👤"),
+          tabBarIcon: tabIcon("👤"),
         }}
       />
     </Tabs>

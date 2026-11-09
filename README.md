@@ -4,7 +4,7 @@ PNG Skills Exchange is a community mobile app for Papua New Guinea that connects
 
 **Student** Ruth Paruru Eludeme  
 | **Student no.** | 23201054  
-| **Unit** | IS323 Mobile Application Development, PNG University of Technology |
+| **Unit** | IS325 Mobile Application Development, PNG University of Technology |
 | **Version** | 1.0.0
 
 ## Features

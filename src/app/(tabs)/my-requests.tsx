@@ -1,4 +1,4 @@
-import { colors } from "@/theme";
+import { colors, statusColors } from "@/theme";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
@@ -11,17 +11,9 @@ import {
 } from "react-native";
 import { supabase } from "../../lib/supabase";
 import { getMyRequests } from "../../services/requests";
-import { RequestStatus, ServiceRequest } from "../../types/requests";
+import { ServiceRequest } from "../../types/requests";
 
 type Filter = "sent" | "received";
-
-const STATUS_COLORS: Record<RequestStatus, { bg: string; fg: string }> = {
-  pending: { bg: "#FFF4D6", fg: "#9A6B00" },
-  accepted: { bg: "#DDF3E4", fg: "#1B7F3B" },
-  declined: { bg: "#FBE0E0", fg: colors.danger },
-  cancelled: { bg: "#E6E8EB", fg: colors.neutralText },
-  completed: { bg: colors.primarySoft, fg: colors.primary },
-};
 
 export default function RequestsListScreen() {
   const [requests, setRequests] = useState<ServiceRequest[]>([]);
@@ -72,7 +64,7 @@ export default function RequestsListScreen() {
   );
 
   const renderItem = ({ item }: { item: ServiceRequest }) => {
-    const colors = STATUS_COLORS[item.status];
+    const badge = statusColors[item.status];
     return (
       <Pressable
         style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
@@ -87,8 +79,8 @@ export default function RequestsListScreen() {
           <Text style={styles.title} numberOfLines={1}>
             {item.skills?.skill_name ?? "Skill"}
           </Text>
-          <View style={[styles.badge, { backgroundColor: colors.bg }]}>
-            <Text style={[styles.badgeText, { color: colors.fg }]}>
+          <View style={[styles.badge, { backgroundColor: badge.bg }]}>
+            <Text style={[styles.badgeText, { color: badge.fg }]}>
               {item.status}
             </Text>
           </View>
@@ -107,7 +99,7 @@ export default function RequestsListScreen() {
   if (loading && requests.length === 0 && !error) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -202,7 +194,7 @@ const styles = StyleSheet.create({
     borderColor: colors.primary,
   },
   filterText: { color: colors.textBody, fontWeight: "600", fontSize: 14 },
-  filterTextSelected: { color: colors.primary },
+  filterTextSelected: { color: colors.onPrimary },
   list: { padding: 16 },
   emptyContainer: { flexGrow: 1, justifyContent: "center", padding: 24 },
   emptyBox: { alignItems: "center" },

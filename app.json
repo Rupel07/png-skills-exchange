@@ -4,22 +4,23 @@
     "slug": "png-skills-exchange",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/android-icon-background.png",
     "scheme": "pngskillsexchange",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/images/icon.png"
+      "icon": "./assets/images/android-icon-background.png"
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#000000",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/images/android-icon-background.png",
+        "backgroundColor": "#000000"
       },
       "package": "com.rupel07.pngskillsexchange",
       "googleServicesFile": "./google-services.json"
     },
-    "web": { "favicon": "./assets/images/icon.png" },
+    "web": {
+      "favicon": "./assets/images/android-icon-background.png"
+    },
     "plugins": [
       "expo-router",
       [
